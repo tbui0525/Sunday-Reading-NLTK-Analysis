@@ -16,7 +16,7 @@ def selection(choice):
 def norm(tokens):
     return [w.lower() for w in tokens if (w.isalpha() and w != 'b')]
 def main():
-    url = 'https://bible.usccb.org/bible/readings/021923.cfm'
+    url = 'https://bible.usccb.org/daily-bible-reading'
     data = urlopen(url).read().decode('utf8')
     soup = BeautifulSoup(data, features ="html.parser")
     content = soup.find('div',
