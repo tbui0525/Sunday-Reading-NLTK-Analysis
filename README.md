@@ -1,4 +1,4 @@
-# PythonProject
+# Only run this on Sundays!
 
 # Setup for developement:
 
