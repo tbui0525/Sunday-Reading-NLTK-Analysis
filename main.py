@@ -6,48 +6,66 @@ import sys
 import re
 from textwrap3 import fill
 from nltk.corpus import PlaintextCorpusReader
+
+
 def selection(choice):
     if choice == 1:
-        return "NABRE/NABRE Old Testament"
+        return "NABRE/NABRE Old Testament lemmatized"
     elif choice == 2:
-        return "NABRE/NABRE 2nd Readings"
+        return "NABRE/NABRE 2nd Readings lemmatized"
     else:
-        return "NABRE/NABRE Gospel"
+        return "NABRE/NABRE Gospel lemmatized"
+
+
 def norm(tokens):
     return [w.lower() for w in tokens if (w.isalpha() and w != 'b')]
+
+
 def main():
-    url = 'https://bible.usccb.org/daily-bible-reading'
+    analyze_date = input("For Today's Date, type [T]. Otherwise, type the date in MMDDYY format")
+    if analyze_date == "T":
+        url = 'https://bible.usccb.org/daily-bible-reading'
+    else:
+        url = f'https://bible.usccb.org/{analyze_date}.cfm'
     data = urlopen(url).read().decode('utf8')
-    soup = BeautifulSoup(data, features ="html.parser")
+    soup = BeautifulSoup(data, features="html.parser")
     content = soup.find('div',
                         class_='page-container node node--type-daily-reading node--promoted node--view-mode-full')
     readings = soup.find_all('div', class_='content-body')
-    #Readings
+    # Readings
     first_reading = readings[0]
     responsial_psalm = readings[1]
     second_reading = readings[2]
     alleluia = readings[3]
     gospel = readings[4]
-    #Printing Readings
-    print("*"*80)
+    # Printing Readings
+    print("*" * 80)
     print("First Reading")
-    print("*"*80)
+    print("*" * 80)
     print(fill(first_reading.get_text(' '), 150))
+    print("*" * 80)
+    print("Responsial Psalm")
+    print("*" * 80)
+    print(fill(responsial_psalm.get_text(' '), 150))
     print("*" * 80)
     print("Second Reading")
     print("*" * 80)
     print(fill(second_reading.get_text(' '), 150))
     print("*" * 80)
+    print("Alleluia")
+    print("*" * 80)
+    print(fill(alleluia.get_text(' '), 150))
+    print("*" * 80)
     print("Gospel")
     print("*" * 80)
     print(fill(gospel.get_text(' '), 150))
-    #User Choice For Analysis
+    # User Choice For Analysis
     choice = input("Which would you like to analyze: [1] for 1st Reading [2] for 2nd Reading [3] for Gospel")
     choice = int(choice)
-    text = readings[(choice-1)*2].get_text(' ')
+    text = readings[(choice - 1) * 2].get_text(' ')
     folder = selection(choice)
     corpus = PlaintextCorpusReader(folder, '.*')
-    #Downloading Text to Separate Folder
+    # Downloading Text to Separate Folder
     sents = nltk.sent_tokenize(text)
     v = []
     for sen in sents:
@@ -58,15 +76,15 @@ def main():
     tagger = nltk.tag.perceptron.PerceptronTagger()
     tagged = [tagger.tag(sent) for sent in toks]
     folder = Path('Text')
-    filename = folder/ ('todays_text.txt')
-    folder.mkdir(exist_ok = True)
+    filename = folder / ('todays_text.txt')
+    folder.mkdir(exist_ok=True)
     with open(filename, 'w') as f:
         for sent in tagged:
-            for w,t in sent:
-                print(w,t, sep='_', end= ' ', file = f)
-            print(file = f)
+            for w, t in sent:
+                print(w, t, sep='_', end=' ', file=f)
+            print(file=f)
     #Loading in tokenized Text
-    tagged_text = nltk.corpus.reader.TaggedCorpusReader('Text/', r'[^.].*\.txt', sep = '_')
+    tagged_text = nltk.corpus.reader.TaggedCorpusReader('Text/', r'[^.].*\.txt', sep='_')
     text = tagged_text.words()
     #Corpus and Text Normalization
     text_norm = norm(text)
@@ -77,12 +95,13 @@ def main():
     bigram_measures = nltk.collocations.BigramAssocMeasures()
     keyness = nltk.FreqDist()
     for w in text_freq:
-        if text_freq[w] > (text_freq.N()/corpus_freq.N()*corpus_freq[w]):
+        if text_freq[w] > (text_freq.N() / corpus_freq.N() * corpus_freq[w]):
             keyness[w] = bigram_measures.likelihood_ratio(text_freq[w],
-                                                           (corpus_freq[w], text_freq.N()), corpus_freq.N())
-    top_25 =keyness.most_common(25)
+                                                          (corpus_freq[w], text_freq.N()), corpus_freq.N())
+    top_25 = keyness.most_common(25)
     for x, y in top_25:
         print(f"{x} {y}")
+
 
 if __name__ == "__main__":
     sys.exit(main())
