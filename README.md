@@ -1,5 +1,6 @@
-# Only run this on Ordinary Sundays. 
-## For other days of the week, or during special occasions, modify the code to match up with the format of the USCCB website format. 
+# Only run this on Ordinary Sundays.
+
+## For other days of the week, or during special occasions, modify the code to match up with the format of the USCCB website format.
 
 # Setup for developement:
 
