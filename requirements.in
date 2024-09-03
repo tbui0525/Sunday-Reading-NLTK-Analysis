@@ -2,3 +2,4 @@ numpy
 nltk
 bs4
 textwrap3
+spacy
